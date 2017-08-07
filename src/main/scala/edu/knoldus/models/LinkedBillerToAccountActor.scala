@@ -1,6 +1,9 @@
 package edu.knoldus.models
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.util.Timeout
+import scala.concurrent.duration.DurationInt
+
 import edu.knoldus.services.DatabaseService
 
 class LinkedBillerToAccountActor(databaseServiceActorRef: ActorRef) extends Actor with ActorLogging {
@@ -9,11 +12,12 @@ class LinkedBillerToAccountActor(databaseServiceActorRef: ActorRef) extends Acto
 
     case (accountNumber: Long, name: String, category: Category.Value) =>
       log.info("Forwarding request to Database Service")
+      implicit val timeout = Timeout(100 seconds)
       databaseServiceActorRef.forward(accountNumber, name, category)
 
     case _ =>
-      log.error("Invalid information received!")
-      sender() ! "Invaid information received!"
+      log.error("Invalid information received while linking!")
+      sender() ! "Invalid information received while linking!"
   }
 
 }
@@ -22,4 +26,5 @@ object LinkedBillerToAccountActor {
 
   def props(databaseServiceActorRef:ActorRef):Props =
     Props(classOf[LinkedBillerToAccountActor], databaseServiceActorRef)
+
 }

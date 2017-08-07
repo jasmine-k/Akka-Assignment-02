@@ -2,6 +2,9 @@ package edu.knoldus.models
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.dispatch.{BoundedMessageQueueSemantics, RequiresMessageQueue}
+import akka.util.Timeout
+import scala.concurrent.duration.DurationInt
+
 import edu.knoldus.CustomerAccount
 
 class AccountGeneratorActor(databaseServiceActorRef: ActorRef) extends Actor with ActorLogging with RequiresMessageQueue[BoundedMessageQueueSemantics] {
@@ -13,6 +16,8 @@ class AccountGeneratorActor(databaseServiceActorRef: ActorRef) extends Actor wit
       accountNumber = accountNumber + 1
       log.info("Assigning Account Number and forwarding request to Database Service")
       val updatedListOfInformation = (accountNumber.toString :: listOfInformation).map(_.toString)
+      implicit val timeout = Timeout(100 seconds)
+
       databaseServiceActorRef.forward(updatedListOfInformation)
 
     case _ =>

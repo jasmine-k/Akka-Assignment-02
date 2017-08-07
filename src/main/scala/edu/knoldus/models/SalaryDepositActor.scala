@@ -66,4 +66,5 @@ class BillProcessActor(databaseServiceActorRef: ActorRef) extends Actor with Act
 object BillProcessActor {
   def props(databaseServiceActorRef:ActorRef): Props =
     Props(classOf[BillProcessActor], databaseServiceActorRef)
+
 }

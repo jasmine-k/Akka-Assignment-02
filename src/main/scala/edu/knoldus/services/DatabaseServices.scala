@@ -31,18 +31,18 @@ class DatabaseService extends Actor with ActorLogging with Database{
       else {
         sender() ! "Already linked to the biller!!"
       }
+    case username: String => sender ! getUserAccount(username).accountNumber
+
     case (accountNumber: Long, name: String,salary: Double) =>
 
       salaryDeposit(accountNumber,name,salary)
+      sender() ! ("Salary deposited successfully")
 
     case (accountNumber: Long, billToBePaid: Double) =>
       payBill(accountNumber,billToBePaid)
 
-    case username: String => sender ! getUserAccount(username).accountNumber
     case accountNo: Long => sender() ! getLinkedBiller.getOrElse(accountNo, Nil).map(_.category)
 
-    case _ =>
-      log.error("Invalid information")
   }
 
 
