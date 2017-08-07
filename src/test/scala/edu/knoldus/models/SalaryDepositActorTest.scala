@@ -6,10 +6,6 @@ import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
 import edu.knoldus.services.UserAccountService
 import org.scalatest.BeforeAndAfterAll
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-
-
 class UserAccountServiceTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike
   with BeforeAndAfterAll with ImplicitSender {
 

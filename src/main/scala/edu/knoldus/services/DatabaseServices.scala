@@ -38,10 +38,12 @@ class DatabaseService extends Actor with ActorLogging with Database{
       salaryDeposit(accountNumber,name,salary)
       sender() ! ("Salary deposited successfully")
 
-    case (accountNumber: Long, billToBePaid: Double) =>
-      payBill(accountNumber,billToBePaid)
-
     case accountNo: Long => sender() ! getLinkedBiller.getOrElse(accountNo, Nil).map(_.category)
+
+    case (accountNumber: Long, billToBePaid: Double) =>
+      val resultOfBillPaid = payBill(accountNumber,billToBePaid)
+      log.info("Received return as " + resultOfBillPaid + " and seding it to sender " + sender())
+      sender() ! resultOfBillPaid
 
   }
 
