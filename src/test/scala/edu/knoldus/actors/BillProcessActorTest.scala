@@ -1,11 +1,10 @@
-package edu.knoldus.models
+package edu.knoldus.actors
+
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
-import edu.knoldus.actors.BillProcessActor
-import org.scalatest.{BeforeAndAfterAll, FunSuite, FunSuiteLike}
+import edu.knoldus.models.Category
 import org.scalatest.mockito.MockitoSugar
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
 
 class BillProcessingActorTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike
@@ -16,49 +15,49 @@ class BillProcessingActorTest extends TestKit(ActorSystem("test-system")) with F
 
   databaseServiceActor.setAutoPilot((sender: ActorRef, msg: Any) => {
     val returnMsg = msg match {
-      case (accountNo: Long, billToPay: Double, billerCategory: Category.Value) => "Bill successfully paid"
+      case (accountNumber: Long, billerCategory: Category.Value) => "Bill Paid Successfully"
     }
     sender ! returnMsg
     TestActor.KeepRunning
   })
 
+  test("Testing for internet category") {
+
+    billProcessingActor ! (20L, Category.phone)
+
+    expectMsg("Bill Paid Successfully")
+
+  }
+
   test("Testing for phone category") {
 
-    billProcessingActor ! (100L, Category.phone)
+    billProcessingActor ! (20L, Category.phone)
 
-    expectMsg("Bill successfully paid")
+    expectMsg("Bill Paid Successfully")
 
   }
 
   test("Testing for car category") {
 
-    billProcessingActor ! (100L, Category.phone)
+    billProcessingActor ! (30L, Category.phone)
 
-    expectMsg("Bill successfully paid")
-
-  }
-
-  test("Testing for internet category") {
-
-    billProcessingActor ! (100L, Category.phone)
-
-    expectMsg("Bill successfully paid")
+    expectMsg("Bill Paid Successfully")
 
   }
 
   test("Testing for food category") {
 
-    billProcessingActor ! (100L, Category.phone)
+    billProcessingActor ! (40L, Category.phone)
 
-    expectMsg("Bill successfully paid")
+    expectMsg("Bill Paid Successfully")
 
   }
 
   test("Testing for electricity category") {
 
-    billProcessingActor ! (100L, Category.phone)
+    billProcessingActor ! (10L, Category.phone)
 
-    expectMsg("Bill successfully paid")
+    expectMsg("Bill Paid Successfully")
 
   }
 

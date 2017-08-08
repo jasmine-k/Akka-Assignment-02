@@ -1,15 +1,20 @@
-package edu.knoldus.models
+package edu.knoldus.actors
 
 import akka.actor.{ActorRef, ActorSystem}
-import org.scalatest.FunSuiteLike
 import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
+import edu.knoldus.models.Category
 import edu.knoldus.services.UserAccountService
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class UserAccountServiceTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike
   with BeforeAndAfterAll with ImplicitSender {
+
+  val databaseService = TestProbe()
+  val billProcessingActor = TestProbe()
+  val salaryDepositActor = system.actorOf(SalaryDepositActor.props(databaseService.ref))
 
   val userAccountServiceObject = new UserAccountService
 
@@ -51,6 +56,12 @@ class UserAccountServiceTest extends TestKit(ActorSystem("test-system")) with Fu
     userAccountServiceObject.linkBillerToAccount(1L, "CarBiller", Category.car, probe.ref).map(
       resultMsg => assert(resultMsg == "Successfully Linked your account with the given biller!")
     )
+
+  }
+  test("Testing SalaryDepositorActor")
+  {
+
+    salaryDepositActor ! (100L, "TestingCustomer", 50000.00)
 
   }
 

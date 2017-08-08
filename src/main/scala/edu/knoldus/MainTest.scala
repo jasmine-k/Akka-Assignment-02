@@ -1,5 +1,5 @@
 import akka.actor.{ActorSystem, Props}
-import edu.knoldus.actors.{AccountGeneratorActor, DatabaseService, LinkedBillerToAccountActor, SalaryDepositActor}
+import edu.knoldus.actors.{AccountGeneratorActor, DatabaseServiceActor, LinkedBillerToAccountActor, SalaryDepositActor}
 import edu.knoldus.models.Category
 import edu.knoldus.services.{SalaryDepositService, UserAccountService}
 
@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object MainTest extends App {
 
   val actorSystem = ActorSystem("AccountSystemActor")
-  val databaseServiceActor = actorSystem.actorOf(DatabaseService.props)
+  val databaseServiceActor = actorSystem.actorOf(DatabaseServiceActor.props)
   val accountGeneratorActor = actorSystem.actorOf(AccountGeneratorActor.props(databaseServiceActor))
   val linkBillerToAccountActor = actorSystem.actorOf(LinkedBillerToAccountActor.props(databaseServiceActor))
   val salaryDepositorActor = actorSystem.actorOf(SalaryDepositActor.props(databaseServiceActor))

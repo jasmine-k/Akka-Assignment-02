@@ -3,27 +3,31 @@ package edu.knoldus
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import edu.knoldus.actors.DatabaseService
+import edu.knoldus.actors.DatabaseServiceActor
 import edu.knoldus.models.{Category, LinkedBiller}
-import org.apache.log4j.Logger
 
 import scala.collection.mutable
 import scala.collection.mutable.{ListBuffer, Map}
 
-trait Database {
+class Database {
 
-  val logger = Logger.getLogger(this.getClass)
   private val userAccount: mutable.Map[String, CustomerAccount] = Map(
-    "jas" -> CustomerAccount(1L,"Jasmine","New Delhi","jas",2000.0),
-    "sim" -> CustomerAccount(2L,"simran","New Delhi","sim",2000.0),
-    "ruby" -> CustomerAccount(3L,"ruby","New Delhi","ruby",2000.0)
+    "jas" -> CustomerAccount(1L, "Jasmine", "New Delhi", "jas", 2000.0),
+    "sim" -> CustomerAccount(2L, "simran", "New Delhi", "sim", 2000.0),
+    "ruby" -> CustomerAccount(3L, "ruby", "New Delhi", "ruby", 2000.0)
 
   )
 
-  def getUserAccount :mutable.Map[String, CustomerAccount] = userAccount
+  def getUserAccount: mutable.Map[String, CustomerAccount] = userAccount
 
-  def addUserAccount( userName: String, customerAccount: CustomerAccount): Unit ={
+  def addUserAccount(userName: String, customerAccount: CustomerAccount): Boolean = {
     userAccount += (userName -> customerAccount)
+    if (userAccount.contains(userName)) {
+      true
+    }
+    else {
+      false
+    }
 
   }
 
@@ -42,37 +46,44 @@ trait Database {
     )
   )
 
-  def getLinkedBiller : mutable.Map[Long, ListBuffer[LinkedBiller]] = linkedBiller
+  def getLinkedBiller: mutable.Map[Long, ListBuffer[LinkedBiller]] = linkedBiller
 
-  def linkBiller(accountNumber: Long, name: String, category: Category.Value): Unit ={
+  def linkBiller(accountNumber: Long, name: String, category: Category.Value): Boolean = {
     val listOfBillers = linkedBiller.getOrElse(accountNumber, Nil)
     listOfBillers match {
 
       case listOfBiller: ListBuffer[LinkedBiller] =>
-        if(!listOfBillers.isEmpty){
+        if (!listOfBillers.isEmpty) {
           linkedBiller(accountNumber) += LinkedBiller(accountNumber, name, category)
         }
+        true
 
       case Nil =>
         linkedBiller += accountNumber -> ListBuffer(LinkedBiller(accountNumber, name, category))
+        true
+
+      case _ => false
     }
   }
 
-  def salaryDeposit (accountNumber: Long, name: String,salary: Double): Unit ={
-    userAccount map {
-      case (userName, customerAccount) =>
-        if (customerAccount.accountNumber == accountNumber) {
-          val newCustomerAccount = customerAccount.copy(initialAmount = customerAccount.initialAmount + salary)
-          (userName, newCustomerAccount)
-        }
-        else {
-          (userName, customerAccount)
-        }
+  def salaryDeposit(accountNumber: Long, name: String, salary: Double): Boolean = {
+
+    val userCustomerAccountList = userAccount.values.filter(_.accountNumber == accountNumber)
+
+    if (userCustomerAccountList.isEmpty) {
+      false
+    }
+
+    else {
+      val customerAccount = userCustomerAccountList.head
+      val newUserAccount = customerAccount.copy(initialAmount = customerAccount.initialAmount + salary)
+      userAccount(customerAccount.userName) = newUserAccount
+      true
     }
 
   }
 
-  def payBill(accountNumber: Long, category: Category.Value, billToPay: Double): Boolean = {
+  def payBill(accountNumber: Long, category: Category.Value): Boolean = {
 
     val billToPayList = linkedBiller.getOrElse(accountNumber, Nil).filter(_.category == category)
     if (billToPayList.isEmpty) {
@@ -82,9 +93,8 @@ trait Database {
       val billToPay = billToPayList.head.amount
       val initialAmountList = userAccount.values.filter(_.accountNumber == accountNumber)
       val initialAmount = initialAmountList.map(_.initialAmount).toList
-      logger.info("Amount in the account is " + initialAmount.head)
       if (initialAmount.head > billToPay) {
-        logger.info("If condition satisfied in payBill")
+
         val linkedBillerCaseClass = linkedBiller(accountNumber).filter(_.category == category).head
         val dateWhilePayingBill = dateFormat.format(Calendar.getInstance().getTime())
         val newlinkedBillerCaseClass = linkedBillerCaseClass.copy(transactionDate = dateWhilePayingBill,
@@ -97,7 +107,46 @@ trait Database {
         listOfLinkedBiller += newlinkedBillerCaseClass
         linkedBiller(accountNumber) = listOfLinkedBiller
 
-        logger.info("LinkedBiller map is as: " + linkedBiller)
+        userAccount foreach {
+          case (username, customerAccount) =>
+            if (customerAccount.accountNumber == accountNumber) {
+              val newCustomerAccount = customerAccount.copy(initialAmount = customerAccount.initialAmount - billToPay)
+              userAccount(username) = newCustomerAccount
+            }
+            else {
+              userAccount(username) = customerAccount
+            }
+        }
+        true
+      }
+      else {
+        false
+      }
+    }
+}
+
+/*
+    val billToPayList = linkedBiller.getOrElse(accountNumber, Nil).filter(_.category == category)
+    if (billToPayList.isEmpty) {
+      false
+    }
+    else {
+      val billToPay = billToPayList.head.amount
+      val initialAmountList = userAccount.values.filter(_.accountNumber == accountNumber)
+      val initialAmount = initialAmountList.map(_.initialAmount).toList
+      if (initialAmount.head > billToPay) {
+        val linkedBillerCaseClass = linkedBiller(accountNumber).filter(_.category == category).head
+        val dateWhilePayingBill = dateFormat.format(Calendar.getInstance().getTime())
+        val newlinkedBillerCaseClass = linkedBillerCaseClass.copy(transactionDate = dateWhilePayingBill,
+          amount = billToPay, totalIterations = linkedBillerCaseClass.totalIterations + 1,
+          executedIterations = linkedBillerCaseClass.executedIterations + 1, paidAmount = linkedBillerCaseClass.amount + billToPay
+        )
+
+        val listOfLinkedBiller = linkedBiller(accountNumber)
+        listOfLinkedBiller -= linkedBillerCaseClass
+        listOfLinkedBiller += newlinkedBillerCaseClass
+        linkedBiller(accountNumber) = listOfLinkedBiller
+
 
         userAccount foreach {
           case (userName, customerAccount) =>
@@ -109,14 +158,13 @@ trait Database {
               userAccount(userName) = customerAccount
             }
         }
-        logger.info("Returning true")
         true
       }
       else {
-        logger.info("Returning false")
         false
       }
     }
   }
+*/
 
 }

@@ -1,12 +1,10 @@
-package edu.knoldus.models
-import akka.actor.{ActorLogging, ActorRef, ActorSystem, Props}
+package edu.knoldus.actors
+
+import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
-import edu.knoldus.actors.LinkedBillerToAccountActor
-import org.apache.log4j.Logger
+import edu.knoldus.models.Category
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 
 

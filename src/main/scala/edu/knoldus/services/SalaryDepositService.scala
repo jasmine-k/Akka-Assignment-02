@@ -9,10 +9,10 @@ import scala.concurrent.Future
 class SalaryDepositService {
 
   def salaryDeposit(accountNumber: Long, name: String,salary: Double,
-                    salaryDepositActorRef: ActorRef): Future[Boolean] = {
+                    salaryDepositActorRef: ActorRef): Future[String] = {
 
     implicit val timeout = Timeout(100 seconds)
-     (salaryDepositActorRef ? (accountNumber, name,salary)).mapTo[Boolean]
+     (salaryDepositActorRef ? (accountNumber, name,salary)).mapTo[String]
 
   }
 

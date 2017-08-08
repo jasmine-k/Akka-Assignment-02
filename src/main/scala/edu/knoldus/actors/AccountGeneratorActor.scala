@@ -11,14 +11,20 @@ class AccountGeneratorActor(databaseServiceActorRef: ActorRef) extends Actor wit
   var accountNumber = 0
 
   override def receive: PartialFunction[Any,Unit] = {
-    case listOfInformation : List[String] =>
-      accountNumber = accountNumber + 1
-      log.info("Assigning Account Number and forwarding request to Database Service")
-      val updatedListOfInformation = ((accountNumber).toString :: listOfInformation).map(_.toString)
-      implicit val timeout = Timeout(100 seconds)
+    case listOfInformation: List[_] =>
+      listOfInformation.head match {
+        case valueToMatch: String  =>
+          accountNumber = accountNumber + 1
+          log.info("Assigning Account Number and forwarding request to Database Service")
+          val updatedListOfInformation = ((accountNumber).toString :: listOfInformation).map(_.toString)
+          implicit val timeout = Timeout(100 seconds)
 
-      databaseServiceActorRef.forward(updatedListOfInformation)
+          databaseServiceActorRef.forward(updatedListOfInformation)
 
+        case _ =>
+          log.error("Invalid Information!")
+          sender() ! "Invalid Information!"
+      }
     case _ =>
       log.error("Invalid Information!")
       sender() ! "Invalid Information!"

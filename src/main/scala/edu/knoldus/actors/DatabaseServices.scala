@@ -5,7 +5,8 @@ import edu.knoldus.models.Category
 import edu.knoldus.{CustomerAccount, Database}
 
 
-class DatabaseService extends Actor with ActorLogging with Database{
+class DatabaseServiceActor extends Database with Actor with ActorLogging {
+
 
   override def receive: Receive = {
 
@@ -35,22 +36,23 @@ class DatabaseService extends Actor with ActorLogging with Database{
 
     case (accountNumber: Long, name: String,salary: Double) =>
 
-      salaryDeposit(accountNumber,name,salary)
+      val resultOfSalaryDeposit = salaryDeposit(accountNumber,name,salary)
+      log.info("Received return as " + resultOfSalaryDeposit + " and sending it to sender " + sender())
       sender() ! ("Salary deposited successfully")
 
     case accountNo: Long => sender() ! getLinkedBiller.getOrElse(accountNo, Nil).map(_.category)
 
-    case (accountNumber: Long, category: Category.Value, billToBePaid: Double) =>
-      val resultOfBillPaid = payBill(accountNumber,category,billToBePaid)
+    case (accountNumber: Long, category: Category.Value) =>
+      val resultOfBillPaid = payBill(accountNumber,category)
       log.info("Received return as " + resultOfBillPaid + " and sending it to sender " + sender())
-      sender() ! resultOfBillPaid
+      sender() ! "Bill Paid Successfully"
 
   }
 
 
 }
 
-object DatabaseService{
-  def props(): Props = Props[DatabaseService]
+object DatabaseServiceActor{
+  def props(): Props = Props[DatabaseServiceActor]
 
 }
