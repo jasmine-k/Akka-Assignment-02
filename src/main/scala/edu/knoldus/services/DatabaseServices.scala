@@ -1,8 +1,8 @@
 package edu.knoldus.services
 
 import akka.actor.{Actor, ActorLogging, Props}
-import edu.knoldus.models.Category
 import edu.knoldus.{CustomerAccount, Database}
+import edu.knoldus.models.{Category}
 
 
 class DatabaseService extends Actor with ActorLogging with Database{
@@ -40,8 +40,8 @@ class DatabaseService extends Actor with ActorLogging with Database{
 
     case accountNo: Long => sender() ! getLinkedBiller.getOrElse(accountNo, Nil).map(_.category)
 
-    case (accountNumber: Long, billToBePaid: Double) =>
-      val resultOfBillPaid = payBill(accountNumber,billToBePaid)
+    case (accountNumber: Long, category: Category.Value, billToBePaid: Double) =>
+      val resultOfBillPaid = payBill(accountNumber,category,billToBePaid)
       log.info("Received return as " + resultOfBillPaid + " and sending it to sender " + sender())
       sender() ! resultOfBillPaid
 

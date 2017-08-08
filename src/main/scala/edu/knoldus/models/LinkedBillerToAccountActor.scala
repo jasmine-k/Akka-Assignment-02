@@ -2,9 +2,8 @@ package edu.knoldus.models
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.util.Timeout
-import scala.concurrent.duration.DurationInt
 
-import edu.knoldus.services.DatabaseService
+import scala.concurrent.duration.DurationInt
 
 class LinkedBillerToAccountActor(databaseServiceActorRef: ActorRef) extends Actor with ActorLogging {
 

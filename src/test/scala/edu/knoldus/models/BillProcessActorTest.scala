@@ -3,6 +3,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, FunSuiteLike}
 import org.scalatest.mockito.MockitoSugar
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -13,10 +14,10 @@ class BillProcessingActorTest extends TestKit(ActorSystem("test-system")) with F
   val billProcessingActor = system.actorOf(BillProcessActor.props(databaseServiceActor.ref))
 
   databaseServiceActor.setAutoPilot((sender: ActorRef, msg: Any) => {
-    val resturnMsg = msg match {
+    val returnMsg = msg match {
       case (accountNo: Long, billToPay: Double, billerCategory: Category.Value) => "Bill successfully paid"
     }
-    sender ! resturnMsg
+    sender ! returnMsg
     TestActor.KeepRunning
   })
 

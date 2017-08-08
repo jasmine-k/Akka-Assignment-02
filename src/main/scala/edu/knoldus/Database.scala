@@ -4,14 +4,17 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 import edu.knoldus.models.{Category, LinkedBiller}
+import edu.knoldus.services.DatabaseService
+import org.apache.log4j.Logger
 
 import scala.collection.mutable
 import scala.collection.mutable.{ListBuffer, Map}
 
 trait Database {
 
+  val logger = Logger.getLogger(this.getClass)
   private val userAccount: mutable.Map[String, CustomerAccount] = Map(
-    "jas1" -> CustomerAccount(1L,"jasmine","New Delhi","jas",2000.0),
+    "jas" -> CustomerAccount(1L,"Jasmine","New Delhi","jas",2000.0),
     "sim" -> CustomerAccount(2L,"simran","New Delhi","sim",2000.0),
     "ruby" -> CustomerAccount(3L,"ruby","New Delhi","ruby",2000.0)
 
@@ -30,7 +33,7 @@ trait Database {
 
   private val linkedBiller: mutable.Map[Long, ListBuffer[LinkedBiller]] = Map(
     1L -> ListBuffer(
-      LinkedBiller(Category.phone, "PhoneBiller", 1L, currentDate, 0.00, 0, 0, 0.00),
+      LinkedBiller(Category.car, "CarBiller", 1L, currentDate, 0.00, 0, 0, 0.00),
       LinkedBiller(Category.internet, "InternetBiller", 1L, currentDate, 0.00, 0, 0, 0.00)
     ),
     2L -> ListBuffer(
@@ -69,28 +72,51 @@ trait Database {
 
   }
 
-  def payBill(accountNumber: Long, billToPay: Double): String = {
+  def payBill(accountNumber: Long, category: Category.Value, billToPay: Double): Boolean = {
 
-    val initialAmount = userAccount.values.filter(_.accountNumber == accountNumber).map(_.initialAmount).toList
-    if (initialAmount.head > billToPay) {
-      userAccount map {
-        case (username, customerAccount) =>
-          if (customerAccount.accountNumber == accountNumber) {
-            val newCustomerAccount = customerAccount.copy(initialAmount = customerAccount.initialAmount - billToPay)
-            (username, newCustomerAccount)
-          }
-          else {
-            (username, customerAccount)
-          }
-      }
-      "Bill successfully paid"
+    val billToPayList = linkedBiller.getOrElse(accountNumber, Nil).filter(_.category == category)
+    if (billToPayList.isEmpty) {
+      false
     }
     else {
-      "Donot have enough amount in account"
+      val billToPay = billToPayList.head.amount
+      val initialAmountList = userAccount.values.filter(_.accountNumber == accountNumber)
+      val initialAmount = initialAmountList.map(_.initialAmount).toList
+      logger.info("Amount in the account is " + initialAmount.head)
+      if (initialAmount.head > billToPay) {
+        logger.info("If condition satisfied in payBill")
+        val linkedBillerCaseClass = linkedBiller(accountNumber).filter(_.category == category).head
+        val dateWhilePayingBill = dateFormat.format(Calendar.getInstance().getTime())
+        val newlinkedBillerCaseClass = linkedBillerCaseClass.copy(transactionDate = dateWhilePayingBill,
+          amount = billToPay, totalIterations = linkedBillerCaseClass.totalIterations + 1,
+          executedIterations = linkedBillerCaseClass.executedIterations + 1, paidAmount = linkedBillerCaseClass.amount + billToPay
+        )
+
+        val listOfLinkedBiller = linkedBiller(accountNumber)
+        listOfLinkedBiller -= linkedBillerCaseClass
+        listOfLinkedBiller += newlinkedBillerCaseClass
+        linkedBiller(accountNumber) = listOfLinkedBiller
+
+        logger.info("LinkedBiller map is as: " + linkedBiller)
+
+        userAccount foreach {
+          case (userName, customerAccount) =>
+            if (customerAccount.accountNumber == accountNumber) {
+              val newCustomerAccount = customerAccount.copy(initialAmount = customerAccount.initialAmount - billToPay)
+              userAccount(userName) = newCustomerAccount
+            }
+            else {
+              userAccount(userName) = customerAccount
+            }
+        }
+        logger.info("Returning true")
+        true
+      }
+      else {
+        logger.info("Returning false")
+        false
+      }
     }
-
   }
-
-
 
 }

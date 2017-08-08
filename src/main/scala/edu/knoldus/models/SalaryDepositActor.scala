@@ -3,8 +3,9 @@ package edu.knoldus.models
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern._
 import akka.util.Timeout
-import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success}
 
@@ -56,13 +57,15 @@ class BillProcessActor(databaseServiceActorRef: ActorRef) extends Actor with Act
 
       billerCategory match {
 
-        case Category.car => databaseServiceActorRef.forward(accountNo, CAR_BILL)
-        case Category.phone => databaseServiceActorRef.forward(accountNo, PHONE_BILL)
-        case Category.internet => databaseServiceActorRef.forward(accountNo, INTERNET_BILL)
-        case Category.electricity => databaseServiceActorRef.forward(accountNo, ELECTRICITY_BILL)
-        case Category.food => databaseServiceActorRef.forward(accountNo, FOOD_BILL)
+        case Category.car => databaseServiceActorRef.forward(accountNo, CAR_BILL, Category.car)
+        case Category.phone => databaseServiceActorRef.forward(accountNo, PHONE_BILL, Category.phone)
+        case Category.internet => databaseServiceActorRef.forward(accountNo, INTERNET_BILL, Category.internet)
+        case Category.electricity => databaseServiceActorRef.forward(accountNo, ELECTRICITY_BILL, Category.electricity)
+        case Category.food => databaseServiceActorRef.forward(accountNo, FOOD_BILL, Category.food)
 
       }
+
+    case _ => sender() ! "Invalid information received"
   }
 }
 
