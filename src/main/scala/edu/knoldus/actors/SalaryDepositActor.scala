@@ -14,25 +14,22 @@ import scala.util.{Failure, Success}
 class SalaryDepositActor(databaseServiceActorRef:ActorRef ) extends Actor with ActorLogging{
   override def receive: Receive = {
     case (accountNumber: Long, name: String,salary: Double) =>
-      log.info("Transferring salary to account ! ")
-      implicit val timeout = Timeout(100 seconds)
+
       databaseServiceActorRef.forward(accountNumber, name, salary)
-
-      //implicit val timeout = Timeout(100 seconds)
+      implicit val timeout = Timeout(100 seconds)
+      log.info("Sender before ask is " + sender())
       val listOfBillers = (databaseServiceActorRef ? accountNumber).mapTo[mutable.ListBuffer[Category.Value]]
-
+      log.info("Sender after ask is " + sender())
+      val senderInSalaryDepositor = sender().actorRef
       listOfBillers onComplete {
 
-        case Success(value) =>log.info("Sender in onComplete is " + sender())
-          value.foreach(billerCategory => context.actorOf(BillProcessActor.props(databaseServiceActorRef)).forward(accountNumber, billerCategory))
+        case Success(value) => log.info("Sender in onComplete is " + senderInSalaryDepositor)
+          value.foreach(billerCategory =>
+            context.actorOf(BillProcessActor.props(databaseServiceActorRef)).tell((accountNumber, billerCategory), senderInSalaryDepositor))
 
         case Failure(ex) => log.info("Failed while receiving listOfBillers with exception " + ex)
 
       }
-
-    case _ =>
-      log.error("Invalid Information received while salary depositing")
-      sender()! "Invalid Information received while salary depositing"
   }
 
 }
@@ -44,6 +41,7 @@ object SalaryDepositActor {
 }
 
 class BillProcessActor(databaseServiceActorRef: ActorRef) extends Actor with ActorLogging {
+
 
   override def receive: Receive = {
 

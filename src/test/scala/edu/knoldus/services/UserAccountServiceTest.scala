@@ -1,20 +1,13 @@
-package edu.knoldus.actors
+package edu.knoldus.services
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
 import edu.knoldus.models.Category
-import edu.knoldus.services.UserAccountService
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
-
 import scala.concurrent.ExecutionContext.Implicits.global
-
 
 class UserAccountServiceTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike
   with BeforeAndAfterAll with ImplicitSender {
-
-  val databaseService = TestProbe()
-  val billProcessingActor = TestProbe()
-  val salaryDepositActor = system.actorOf(SalaryDepositActor.props(databaseService.ref))
 
   val userAccountServiceObject = new UserAccountService
 
@@ -42,25 +35,20 @@ class UserAccountServiceTest extends TestKit(ActorSystem("test-system")) with Fu
       ))
   }
 
-  test("Testing linking of biller and account")
+  test("Testing linking of biller to account")
   {
     val probe = TestProbe()
     probe.setAutoPilot((sender: ActorRef, msg: Any) => {
-      val resturnMsg = msg match {
-        case (accountNo: Long, billerName: String, billerCategory: Category.Value) => "Successfully Linked your account with the given biller!"
+      val returnMsg = msg match {
+        case (accountNumber: Long, billerName: String, billerCategory: Category.Value) => "Successfully Linked your account with the given biller!"
       }
-      sender ! resturnMsg
+      sender ! returnMsg
       TestActor.KeepRunning
     })
 
-    userAccountServiceObject.linkBillerToAccount(1L, "CarBiller", Category.car, probe.ref).map(
-      resultMsg => assert(resultMsg == "Successfully Linked your account with the given biller!")
+    userAccountServiceObject.linkBillerToAccount(3L, "TestingBiller", Category.car, probe.ref).map(
+      resutlMsg => assert(resutlMsg == "Linked to biller successfully!!")
     )
-
-  }
-  test("Testing SalaryDepositorActor")
-  {
-    salaryDepositActor ! (100L, "TestingCustomer", 50000.00)
 
   }
 

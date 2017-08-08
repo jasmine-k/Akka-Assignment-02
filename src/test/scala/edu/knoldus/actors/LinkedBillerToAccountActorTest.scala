@@ -6,8 +6,6 @@ import edu.knoldus.models.Category
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 
-
-
 class LinkedBillerToAccountActorTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike
   with BeforeAndAfterAll with ImplicitSender with MockitoSugar {
 

@@ -6,11 +6,8 @@ import edu.knoldus.models.{Category, LinkedBiller}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
 import org.mockito.Mockito._
-
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-
-
 
 class DatabaseServiceActorTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike
   with BeforeAndAfterAll with ImplicitSender with MockitoSugar {
@@ -37,7 +34,6 @@ class DatabaseServiceActorTest extends TestKit(ActorSystem("test-system")) with 
   {
 
     val listOfInformation = List("1", "Jasmine", "New Delhi", "jasmine", "100.00")
-
     when(database.getUserAccount).thenReturn(mutable.Map(
       "jasmine" -> CustomerAccount(1L, "Jasmine", "New Delhi", "jasmine", 100.00),
       "sim" -> CustomerAccount(2L, "Simran", "New Delhi", "sim", 0.00)
@@ -70,7 +66,6 @@ class DatabaseServiceActorTest extends TestKit(ActorSystem("test-system")) with 
     databaseServiceActor ! listOfInformation
 
     expectMsgPF() {
-
       case (username: String, msg: String) => assert(username == "jasmine" &&
         msg == "Username already exists!!")
 
@@ -82,11 +77,8 @@ class DatabaseServiceActorTest extends TestKit(ActorSystem("test-system")) with 
   {
 
     when(database.getLinkedBiller).thenReturn(linkedBiller)
-
     when(database.linkBiller(100L, "TestingBiller", Category.phone)).thenReturn(true)
-
     databaseServiceActor ! (100L, "TestingBiller", Category.phone)
-
     expectMsg("Linked to biller successfully!!")
 
   }
@@ -95,9 +87,7 @@ class DatabaseServiceActorTest extends TestKit(ActorSystem("test-system")) with 
   {
 
     when(database.getLinkedBiller).thenReturn(linkedBiller)
-
     databaseServiceActor ! (1L, "TestingBiller", Category.car)
-
     expectMsg("Already linked to the biller!!")
 
   }
@@ -113,7 +103,6 @@ class DatabaseServiceActorTest extends TestKit(ActorSystem("test-system")) with 
     when(database.getUserAccount).thenReturn(userAccountMap)
 
     databaseServiceActor ! "jasmine"
-
     expectMsgPF() {
       case accountNo: Long => assert(accountNo == 1L)
     }
@@ -124,9 +113,7 @@ class DatabaseServiceActorTest extends TestKit(ActorSystem("test-system")) with 
   {
 
     when(database.salaryDeposit(1L, "Jasmine", 10000.00)).thenReturn(true)
-
     databaseServiceActor ! (1L, "Jasmine", 10000.00)
-
     expectMsg("Salary deposited successfully")
 
   }
@@ -135,9 +122,7 @@ class DatabaseServiceActorTest extends TestKit(ActorSystem("test-system")) with 
   {
 
     when(database.getLinkedBiller).thenReturn(linkedBiller)
-
     databaseServiceActor ! (1L)
-
     expectMsgPF() {
 
       case billerCategoryList: Seq[Category.Value] => assert(billerCategoryList(0) == Category.car &&
@@ -151,9 +136,7 @@ class DatabaseServiceActorTest extends TestKit(ActorSystem("test-system")) with 
   {
 
     when(database.payBill(1L, Category.car)).thenReturn(true)
-
     databaseServiceActor ! (1L, Category.car)
-
     expectMsg("Bill Paid Successfully")
 
   }
