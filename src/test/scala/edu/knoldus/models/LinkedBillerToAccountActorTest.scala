@@ -1,6 +1,7 @@
 package edu.knoldus.models
 import akka.actor.{ActorLogging, ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
+import edu.knoldus.actors.LinkedBillerToAccountActor
 import org.apache.log4j.Logger
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}

@@ -1,7 +1,8 @@
-package edu.knoldus.models
+package edu.knoldus.actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.util.Timeout
+import edu.knoldus.models.Category
 
 import scala.concurrent.duration.DurationInt
 

@@ -1,4 +1,4 @@
-package edu.knoldus.models
+package edu.knoldus.actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.dispatch.{BoundedMessageQueueSemantics, RequiresMessageQueue}

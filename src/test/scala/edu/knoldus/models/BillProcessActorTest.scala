@@ -1,6 +1,7 @@
 package edu.knoldus.models
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
+import edu.knoldus.actors.BillProcessActor
 import org.scalatest.{BeforeAndAfterAll, FunSuite, FunSuiteLike}
 import org.scalatest.mockito.MockitoSugar
 

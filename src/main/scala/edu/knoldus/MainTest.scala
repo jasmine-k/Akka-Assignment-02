@@ -1,6 +1,8 @@
 import akka.actor.{ActorSystem, Props}
-import edu.knoldus.models.{AccountGeneratorActor, Category, LinkedBillerToAccountActor, SalaryDepositActor}
-import edu.knoldus.services.{DatabaseService, SalaryDepositService, UserAccountService}
+import edu.knoldus.actors.{AccountGeneratorActor, DatabaseService, LinkedBillerToAccountActor, SalaryDepositActor}
+import edu.knoldus.models.Category
+import edu.knoldus.services.{SalaryDepositService, UserAccountService}
+
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 

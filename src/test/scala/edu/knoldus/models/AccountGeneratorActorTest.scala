@@ -3,7 +3,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import org.scalatest.FunSuiteLike
 import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
 import edu.knoldus.CustomerAccount
-import edu.knoldus.models.AccountGeneratorActor
+import edu.knoldus.actors.AccountGeneratorActor
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._

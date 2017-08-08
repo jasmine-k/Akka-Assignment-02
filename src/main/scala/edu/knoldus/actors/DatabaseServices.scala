@@ -1,8 +1,8 @@
-package edu.knoldus.services
+package edu.knoldus.actors
 
 import akka.actor.{Actor, ActorLogging, Props}
+import edu.knoldus.models.Category
 import edu.knoldus.{CustomerAccount, Database}
-import edu.knoldus.models.{Category}
 
 
 class DatabaseService extends Actor with ActorLogging with Database{
