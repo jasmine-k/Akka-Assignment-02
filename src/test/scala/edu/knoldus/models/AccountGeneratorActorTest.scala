@@ -7,6 +7,8 @@ import edu.knoldus.models.AccountGeneratorActor
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Mockito._
+import scala.concurrent.ExecutionContext.Implicits.global
+
 
 
 class AccountGeneratorActorTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike
@@ -21,9 +23,9 @@ class AccountGeneratorActorTest extends TestKit(ActorSystem("test-system")) with
 
   test("Testing AccountGeneratorActor which should return map containing status message for each account") {
 
-    val customerAccount = CustomerAccount(1L, "Jasmine", "New Delhi", "jasmine", 0.00)
+    val customerAccount = CustomerAccount(1L, "Jasmine", "New Delhi", "ruby", 0.00)
 
-    accountGeneratorActorRef ! List("Jasmine", "New Delhi", "jasmine", "10.00")
+    accountGeneratorActorRef ! List("Jasmine", "New Delhi", "ruby", "10.00")
 
     databaseServiceProbe.setAutoPilot((sender: ActorRef, msg: Any) => {
       val returnMsg = msg match {
@@ -35,25 +37,25 @@ class AccountGeneratorActorTest extends TestKit(ActorSystem("test-system")) with
 
     expectMsgPF() {
       case (username: String, resultMsg: String) =>
-        assert(username == "jasmine" &&
+        assert(username == "ruby" &&
           resultMsg == "Account created successfully!")
     }
   }
 
   test("Testing AccountGeneratorActor with existing username") {
 
-    accountGeneratorActorRef ! List("Jasmine", "New Delhi", "jasmine", "10.00")
+    accountGeneratorActorRef ! List("jasmine", "New Delhi", "ruby", "10.00")
 
     databaseServiceProbe.setAutoPilot((sender: ActorRef, msg: Any) => {
       val returnMsg = msg match {
-        case listOfInformation: List[String] => ("jasmine", "Username already exists!!")
+        case listOfInformation: List[String] => ("ruby", "Username already exists!!")
       }
       sender ! returnMsg
       TestActor.KeepRunning
     })
 
     expectMsgPF() {
-      case (username: String,resultMsg: String) => assert(username == "jasmine" &&
+      case (username: String,resultMsg: String) => assert(username == "ruby" &&
         resultMsg == "Username already exists!!")
     }
   }

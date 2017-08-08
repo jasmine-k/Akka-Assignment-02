@@ -12,7 +12,8 @@ trait Database {
 
   private val userAccount: mutable.Map[String, CustomerAccount] = Map(
     "jas1" -> CustomerAccount(1L,"jasmine","New Delhi","jas",2000.0),
-    "sim" -> CustomerAccount(2L,"simran","New Delhi","sim",2000.0)
+    "sim" -> CustomerAccount(2L,"simran","New Delhi","sim",2000.0),
+    "ruby" -> CustomerAccount(3L,"ruby","New Delhi","ruby",2000.0)
 
   )
 
@@ -68,7 +69,7 @@ trait Database {
 
   }
 
-  def payBill(accountNumber: Long, billToPay: Double): Boolean = {
+  def payBill(accountNumber: Long, billToPay: Double): String = {
 
     val initialAmount = userAccount.values.filter(_.accountNumber == accountNumber).map(_.initialAmount).toList
     if (initialAmount.head > billToPay) {
@@ -82,10 +83,10 @@ trait Database {
             (username, customerAccount)
           }
       }
-      true
+      "Bill successfully paid"
     }
     else {
-      false
+      "Donot have enough amount in account"
     }
 
   }

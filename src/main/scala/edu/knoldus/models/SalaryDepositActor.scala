@@ -4,7 +4,6 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.pattern._
 import akka.util.Timeout
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success}
@@ -14,9 +13,10 @@ class SalaryDepositActor(databaseServiceActorRef:ActorRef ) extends Actor with A
   override def receive: Receive = {
     case (accountNumber: Long, name: String,salary: Double) =>
       log.info("Transferring salary to account ! ")
+      implicit val timeout = Timeout(100 seconds)
       databaseServiceActorRef.forward(accountNumber, name, salary)
 
-      implicit val timeout = Timeout(100 seconds)
+      //implicit val timeout = Timeout(100 seconds)
       val listOfBillers = (databaseServiceActorRef ? accountNumber).mapTo[mutable.ListBuffer[Category.Value]]
       listOfBillers onComplete {
 
@@ -50,7 +50,10 @@ class BillProcessActor(databaseServiceActorRef: ActorRef) extends Actor with Act
 
   override def receive: Receive = {
 
+
     case (accountNo: Long, billerCategory: Category.Value) =>
+      implicit val timeout = Timeout(100 seconds)
+
       billerCategory match {
 
         case Category.car => databaseServiceActorRef.forward(accountNo, CAR_BILL)

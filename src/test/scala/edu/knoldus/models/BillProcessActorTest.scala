@@ -3,6 +3,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, FunSuiteLike}
 import org.scalatest.mockito.MockitoSugar
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class BillProcessingActorTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike

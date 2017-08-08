@@ -4,6 +4,8 @@ import akka.testkit.{ImplicitSender, TestActor, TestKit, TestProbe}
 import org.apache.log4j.Logger
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
+import scala.concurrent.ExecutionContext.Implicits.global
+
 
 
 class LinkBillerToAccountActorTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike
@@ -34,7 +36,7 @@ class LinkBillerToAccountActorTest extends TestKit(ActorSystem("test-system")) w
 
   test("Testing LinkBillerToAccountActor with a link already existing")
   {
-    linkedBillerToAccountActorRef ! (1L, "TestingBiller", Category.food)
+    linkedBillerToAccountActorRef ! (1L, "TestingBiller", Category.car)
 
     databaseServiceProbe.setAutoPilot((sender: ActorRef, msg: Any) => {
       val resturnMsg = msg match {

@@ -42,7 +42,7 @@ class DatabaseService extends Actor with ActorLogging with Database{
 
     case (accountNumber: Long, billToBePaid: Double) =>
       val resultOfBillPaid = payBill(accountNumber,billToBePaid)
-      log.info("Received return as " + resultOfBillPaid + " and seding it to sender " + sender())
+      log.info("Received return as " + resultOfBillPaid + " and sending it to sender " + sender())
       sender() ! resultOfBillPaid
 
   }
